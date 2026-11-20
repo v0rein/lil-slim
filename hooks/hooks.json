@@ -1,0 +1,70 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/run.sh\" phase-reminder --notice",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Read|Grep|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/run.sh\" absolute-path-rescue",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Grep|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/run.sh\" search-path-guard",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/run.sh\" readonly-shell-guard",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "^(?!(?:Task|Agent|TaskOutput|TaskStop|TaskGet|TaskList|BashOutput|KillShell|Monitor)$).+",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/run.sh\" tool-loop-guard",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^(?!(?:Task|Agent|TaskOutput|TaskStop|TaskGet|TaskList|BashOutput|KillShell|Monitor)$).+",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/run.sh\" tool-loop-guard",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

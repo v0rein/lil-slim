@@ -1,0 +1,11 @@
+{
+  "name": "lil-slim-marketplace",
+  "owner": { "name": "v0rein" },
+  "plugins": [
+    {
+      "name": "lil-slim",
+      "source": "./",
+      "description": "Lightweight orchestrator + specialist workflow for Claude Code, ported from oh-my-opencode-slim."
+    }
+  ]
+}
