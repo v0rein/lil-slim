@@ -41,3 +41,44 @@ jobs:
           BIN="hooks/rust/target/release/lil-hook"
           [ -f "$BIN.exe" ] && BIN="$BIN.exe"
           node hooks/rust/parity.mjs "$PWD" "$PWD/$BIN"
+
+  # Runs the COMMITTED binaries (what users actually get) natively on each
+  # platform: parity with the Node hooks, and a full hook round trip through
+  # run.sh with node removed from PATH.
+  committed-binaries:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: linux-x64, os: ubuntu-24.04, exe: lil-hook }
+          - { platform: linux-arm64, os: ubuntu-24.04-arm, exe: lil-hook }
+          - { platform: darwin-arm64, os: macos-15, exe: lil-hook }
+          - { platform: darwin-x64, os: macos-15-intel, exe: lil-hook }
+          - { platform: windows-x64, os: windows-latest, exe: lil-hook.exe }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Checksums match
+        shell: bash
+        working-directory: hooks/bin
+        run: |
+          if command -v sha256sum >/dev/null; then grep " ${{ matrix.platform }}/" SHA256SUMS | sha256sum -c -;
+          else grep " ${{ matrix.platform }}/" SHA256SUMS | shasum -a 256 -c -; fi
+      - name: Parity with the Node hooks
+        shell: bash
+        run: node hooks/rust/parity.mjs "$PWD" "$PWD/hooks/bin/${{ matrix.platform }}/${{ matrix.exe }}"
+      - name: Round trip through run.sh with no node on PATH
+        shell: bash
+        run: |
+          ROOT="$PWD"
+          IN='{"hook_event_name":"SessionStart","agent_type":"lil-slim:orchestrator"}'
+          NODE_DIR="$(dirname "$(command -v node)")"
+          # drop node's directory from PATH, keep the rest (sh, uname)
+          CLEAN="$(printf '%s' "$PATH" | tr ':' '\n' | grep -vxF "$NODE_DIR" | paste -sd: -)"
+          if PATH="$CLEAN" command -v node >/dev/null 2>&1; then echo "node still reachable, test invalid"; exit 1; fi
+          OUT="$(printf '%s' "$IN" | PATH="$CLEAN" sh "$ROOT/hooks/scripts/run.sh" phase-reminder)"
+          echo "$OUT" | grep -q "Scheduler workflow" || { echo "no reminder from the binary path: $OUT"; exit 1; }
+          echo "ok: $(printf '%s' "$OUT" | head -c 80)"

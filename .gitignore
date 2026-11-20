@@ -4,4 +4,3 @@ node_modules/
 
 # Rust build output
 hooks/rust/target/
-hooks/bin/

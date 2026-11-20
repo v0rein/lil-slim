@@ -1,0 +1,54 @@
+name: binaries
+
+# Builds the hook binary for every supported platform. It never commits: it
+# uploads artifacts, which are installed with
+#   node hooks/rust/update-binaries.mjs <artifacts-dir>
+# and reviewed in a normal pull request. The test workflow then verifies the
+# committed bytes natively on each platform.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'hooks/rust/**'
+      - '.github/workflows/binaries.yml'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: linux-x64, os: ubuntu-24.04, target: x86_64-unknown-linux-musl, exe: lil-hook }
+          - { platform: linux-arm64, os: ubuntu-24.04-arm, target: aarch64-unknown-linux-musl, exe: lil-hook }
+          - { platform: darwin-arm64, os: macos-15, target: aarch64-apple-darwin, exe: lil-hook }
+          - { platform: darwin-x64, os: macos-15-intel, target: x86_64-apple-darwin, exe: lil-hook }
+          - { platform: windows-x64, os: windows-latest, target: x86_64-pc-windows-msvc, exe: lil-hook.exe }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - name: Install musl tools
+        if: contains(matrix.target, 'linux-musl')
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+      - name: Build
+        working-directory: hooks/rust
+        shell: bash
+        env:
+          RUSTFLAGS: -C target-feature=+crt-static
+        run: cargo build --release --locked --target ${{ matrix.target }}
+      - name: Show linkage
+        shell: bash
+        run: |
+          f="hooks/rust/target/${{ matrix.target }}/release/${{ matrix.exe }}"
+          ls -l "$f"
+          case "${{ matrix.platform }}" in
+            linux-*) file "$f" || true; (ldd "$f" 2>&1 || true) | head -2 ;;
+            darwin-*) otool -L "$f" ;;
+          esac
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lil-hook-${{ matrix.platform }}
+          path: hooks/rust/target/${{ matrix.target }}/release/${{ matrix.exe }}
+          if-no-files-found: error

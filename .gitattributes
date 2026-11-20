@@ -3,3 +3,6 @@
 *.mjs text eol=lf
 *.md text eol=lf
 *.json text eol=lf
+
+# prebuilt hook binaries are committed on purpose; never rewrite their bytes
+hooks/bin/** binary
