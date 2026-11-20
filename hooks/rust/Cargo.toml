@@ -1,0 +1,18 @@
+[package]
+name = "lil-hook"
+version = "0.1.0"
+edition = "2021"
+description = "Optional Rust build of the lil-slim guard hooks. The Node scripts remain the default."
+license = "MIT"
+publish = false
+
+[dependencies]
+serde_json = { version = "1", features = ["preserve_order"] }
+regex = { version = "1", default-features = false, features = ["std", "perf", "unicode-perl", "unicode-case"] }
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

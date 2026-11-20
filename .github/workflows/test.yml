@@ -16,3 +16,28 @@ jobs:
       # Bare `node --test` discovers test/*.test.mjs on every Node version;
       # `node --test test/` is treated as a module path on Node 22.
       - run: node --test
+
+  rust:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Unit tests
+        working-directory: hooks/rust
+        run: cargo test
+      - name: Build release binary
+        working-directory: hooks/rust
+        run: cargo build --release
+      - name: Parity with the Node hooks
+        shell: bash
+        run: |
+          BIN="hooks/rust/target/release/lil-hook"
+          [ -f "$BIN.exe" ] && BIN="$BIN.exe"
+          node hooks/rust/parity.mjs "$PWD" "$PWD/$BIN"

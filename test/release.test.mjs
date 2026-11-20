@@ -1,11 +1,13 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const posix = (p) => p.split(path.sep).join('/');
 const read = (f) => readFileSync(path.join(root, f), 'utf8');
 const json = (f) => JSON.parse(read(f));
 
@@ -155,4 +157,48 @@ test('no leftover former plugin name in shipped files', () => {
   for (const f of ['README.md', '.claude-plugin/plugin.json', '.claude-plugin/marketplace.json', 'hooks/hooks.json']) {
     assert.doesNotMatch(read(f), /oh-my-claude-slim/, f);
   }
+});
+
+test('run.sh prefers a Rust binary (LIL_HOOK_BIN or hooks/bin) and falls back to Node', (t) => {
+  const bash = findBash();
+  if (!bash) return t.skip('no bash available');
+  const dir = mkdtempSync(path.join(tmpdir(), 'lil-bin-'));
+  const fake = path.join(dir, 'lil-hook');
+  writeFileSync(fake, '#!/bin/sh\nprintf "RUST:%s" "$1"\n');
+  chmodSync(fake, 0o755);
+  const sh = posix(path.join(root, 'hooks', 'scripts', 'run.sh'));
+  const run = (env) =>
+    spawnSync(bash, ['-c', `sh "${sh}" phase-reminder`], {
+      input: '{}',
+      encoding: 'utf8',
+      env: { PATH: process.env.PATH, ...env },
+    });
+  assert.equal(run({ LIL_HOOK_BIN: posix(fake) }).stdout, 'RUST:phase-reminder');
+  assert.notEqual(run({ LIL_HOOK_BIN: `${dir}/missing` }).stdout, 'RUST:phase-reminder');
+  assert.notEqual(run({}).stdout, 'RUST:phase-reminder');
+});
+
+test('with a Rust binary present, hooks no longer need Node', (t) => {
+  const bash = findBash();
+  if (!bash) return t.skip('no bash available');
+  const dir = mkdtempSync(path.join(tmpdir(), 'lil-bin2-'));
+  const fake = path.join(dir, 'lil-hook');
+  writeFileSync(fake, '#!/bin/sh\nprintf "OK"\n');
+  chmodSync(fake, 0o755);
+  const sh = posix(path.join(root, 'hooks', 'scripts', 'run.sh'));
+  const r = spawnSync(bash, ['-c', `sh "${sh}" tool-loop-guard`], {
+    input: '{}',
+    encoding: 'utf8',
+    env: { PATH: '/usr/bin:/bin', LIL_HOOK_BIN: posix(fake) },
+  });
+  assert.equal(r.stdout, 'OK');
+});
+
+test('Rust sources, parity script and CI job ship together', () => {
+  for (const f of ['hooks/rust/Cargo.toml', 'hooks/rust/Cargo.lock', 'hooks/rust/parity.mjs', 'hooks/rust/src/main.rs']) {
+    assert.ok(existsSync(path.join(root, f)), f);
+  }
+  assert.match(read('.github/workflows/test.yml'), /cargo test/);
+  assert.match(read('.github/workflows/test.yml'), /parity\.mjs/);
+  assert.match(read('.gitignore'), /hooks\/rust\/target|\/target/);
 });

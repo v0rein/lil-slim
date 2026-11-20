@@ -100,6 +100,18 @@ sessions and other plugins' agents are untouched. Loop-guard state lives in
 - **Permissions:** most testing used `--dangerously-skip-permissions`. One headless run in the default permission mode showed the same hook decisions. Interactive approval prompts, and how the path-rescue hook interacts with your `ask` rules, have not been exercised.
 - **Cost:** one large ticket that fans out to many agents cost roughly $12-17 in testing. Use `--max-budget-usd` to cap a session.
 
+## Optional: Rust hooks
+
+The five guard hooks also exist as one small Rust binary (`hooks/rust`, about 1.1 MB). It is optional and off by default: `hooks/scripts/run.sh` uses it only when it finds `hooks/bin/lil-hook` (`.exe` on Windows) or `$LIL_HOOK_BIN`, and otherwise runs the Node scripts. With the binary present, Node is not needed for hooks at all.
+
+```bash
+cd hooks/rust && cargo build --release
+mkdir -p ../bin && cp target/release/lil-hook ../bin/   # lil-hook.exe on Windows
+node parity.mjs ../.. "$PWD/../bin/lil-hook"             # optional: compare against the Node hooks
+```
+
+Measured on one Windows machine (30 runs each): about 59 ms per hook call through `run.sh` with the binary, versus about 148 ms with Node. Claude Code's own per-hook timing in a real session also includes its process launch, so expect a smaller absolute gain than the micro-benchmark. `parity.mjs` feeds 80 events to both implementations and requires identical output, and Rust-written loop-guard state is read by the Node script and the reverse. Build the binary per machine and do not commit it (`hooks/bin/` is git-ignored); updating the plugin does not rebuild it.
+
 ## State directory
 
 The `deepwork` and `worktrees` skills keep their state under `.lil-slim/` in your

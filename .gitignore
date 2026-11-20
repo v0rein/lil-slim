@@ -1,3 +1,7 @@
 .superpowers/
 node_modules/
 *.log
+
+# Rust build output
+hooks/rust/target/
+hooks/bin/
