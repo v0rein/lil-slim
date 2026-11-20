@@ -236,3 +236,9 @@ test('README describes the prebuilt-binary default and the Node fallback', () =>
   assert.match(r, /update-binaries\.mjs/);
   assert.doesNotMatch(r, /Optional: Rust hooks/);
 });
+
+test('CI proves the binary path with a node shim, not by hiding node', () => {
+  const y = read('.github/workflows/test.yml');
+  assert.match(y, /NODE-RAN/);
+  assert.match(y, /Prove run\.sh uses the binary and not node/);
+});

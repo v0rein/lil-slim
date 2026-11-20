@@ -70,15 +70,29 @@ jobs:
       - name: Parity with the Node hooks
         shell: bash
         run: node hooks/rust/parity.mjs "$PWD" "$PWD/hooks/bin/${{ matrix.platform }}/${{ matrix.exe }}"
-      - name: Round trip through run.sh with no node on PATH
+      - name: Prove run.sh uses the binary and not node
         shell: bash
         run: |
           ROOT="$PWD"
+          PLAT="${{ matrix.platform }}"
           IN='{"hook_event_name":"SessionStart","agent_type":"lil-slim:orchestrator"}'
-          NODE_DIR="$(dirname "$(command -v node)")"
-          # drop node's directory from PATH, keep the rest (sh, uname)
-          CLEAN="$(printf '%s' "$PATH" | tr ':' '\n' | grep -vxF "$NODE_DIR" | paste -sd: -)"
-          if PATH="$CLEAN" command -v node >/dev/null 2>&1; then echo "node still reachable, test invalid"; exit 1; fi
-          OUT="$(printf '%s' "$IN" | PATH="$CLEAN" sh "$ROOT/hooks/scripts/run.sh" phase-reminder)"
-          echo "$OUT" | grep -q "Scheduler workflow" || { echo "no reminder from the binary path: $OUT"; exit 1; }
-          echo "ok: $(printf '%s' "$OUT" | head -c 80)"
+          # A fake node that wins PATH lookup and prints a marker. If run.sh ever
+          # runs node, the marker shows up instead of the real hook output.
+          SHIM="$(mktemp -d)"
+          printf '#!/bin/sh
+printf NODE-RAN
+' > "$SHIM/node"
+          chmod +x "$SHIM/node"
+          [ "$(PATH="$SHIM:$PATH" command -v node)" = "$SHIM/node" ] || { echo "shim does not win lookup"; exit 1; }
+          OUT="$(printf '%s' "$IN" | PATH="$SHIM:$PATH" sh "$ROOT/hooks/scripts/run.sh" phase-reminder)"
+          case "$OUT" in
+            *NODE-RAN*) echo "run.sh used node instead of the binary: [$OUT]"; exit 1 ;;
+            *"Scheduler workflow"*) echo "ok, binary output: $(printf '%s' "$OUT" | head -c 80)" ;;
+            *) echo "unexpected output: [$OUT]"; exit 1 ;;
+          esac
+          # and the fallback chain is live: without the binary, the shim is reached
+          mv "$ROOT/hooks/bin/$PLAT" "$ROOT/hooks/bin/$PLAT.off"
+          OUT2="$(printf '%s' "$IN" | PATH="$SHIM:$PATH" sh "$ROOT/hooks/scripts/run.sh" phase-reminder)"
+          mv "$ROOT/hooks/bin/$PLAT.off" "$ROOT/hooks/bin/$PLAT"
+          [ "$OUT2" = "NODE-RAN" ] || { echo "fallback did not reach node: [$OUT2]"; exit 1; }
+          echo "ok, fallback reaches node when the binary is absent"
