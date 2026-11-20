@@ -242,3 +242,13 @@ test('CI proves the binary path with a node shim, not by hiding node', () => {
   assert.match(y, /NODE-RAN/);
   assert.match(y, /Prove run\.sh uses the binary and not node/);
 });
+
+test('workflow files keep every line inside its block (no stray column-0 text)', () => {
+  for (const f of ['test.yml', 'binaries.yml']) {
+    const lines = read(`.github/workflows/${f}`).replace(/\r/g, '').split('\n');
+    lines.forEach((l, i) => {
+      if (l === '' ) return;
+      assert.match(l, /^(\s|#|[A-Za-z_-]+:|---)/, `${f}:${i + 1} stray column-0 text: ${l.slice(0, 40)}`);
+    });
+  }
+});

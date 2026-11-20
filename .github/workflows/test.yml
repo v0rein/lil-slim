@@ -79,9 +79,7 @@ jobs:
           # A fake node that wins PATH lookup and prints a marker. If run.sh ever
           # runs node, the marker shows up instead of the real hook output.
           SHIM="$(mktemp -d)"
-          printf '#!/bin/sh
-printf NODE-RAN
-' > "$SHIM/node"
+          printf '%s\n' '#!/bin/sh' 'printf NODE-RAN' > "$SHIM/node"
           chmod +x "$SHIM/node"
           [ "$(PATH="$SHIM:$PATH" command -v node)" = "$SHIM/node" ] || { echo "shim does not win lookup"; exit 1; }
           OUT="$(printf '%s' "$IN" | PATH="$SHIM:$PATH" sh "$ROOT/hooks/scripts/run.sh" phase-reminder)"
