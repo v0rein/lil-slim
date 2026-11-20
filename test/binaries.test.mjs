@@ -188,3 +188,51 @@ test('update-binaries script exists and refuses to run without artifacts', () =>
   assert.notEqual(r.status, 0);
   assert.match(r.stderr, /usage/i);
 });
+
+// ---- the real committed binary for THIS machine ---------------------------
+
+function hostPlatform() {
+  const a = process.arch;
+  if (process.platform === 'win32' && a === 'x64') return 'windows-x64';
+  if (process.platform === 'linux' && a === 'x64') return 'linux-x64';
+  if (process.platform === 'linux' && a === 'arm64') return 'linux-arm64';
+  if (process.platform === 'darwin' && a === 'arm64') return 'darwin-arm64';
+  if (process.platform === 'darwin' && a === 'x64') return 'darwin-x64';
+  return null;
+}
+
+test('the committed binary for this machine serves hooks through run.sh with no node on PATH', (t) => {
+  const plat = hostPlatform();
+  const bash = findBash();
+  if (!plat || !bash) return t.skip('no supported host or bash');
+  const sh = posix(path.join(root, 'hooks', 'scripts', 'run.sh'));
+  const input = JSON.stringify({ hook_event_name: 'SessionStart', agent_type: 'lil-slim:orchestrator' });
+  const r = spawnSync(bash, ['-c', `sh "${sh}" phase-reminder`], {
+    input,
+    encoding: 'utf8',
+    env: { PATH: '/usr/bin:/bin', CLAUDE_PLUGIN_ROOT: posix(root) },
+  });
+  assert.equal(r.status, 0);
+  const out = JSON.parse(r.stdout);
+  assert.match(out.hookSpecificOutput.additionalContext, /Scheduler workflow/);
+  // and it is byte-identical to what the Node implementation prints
+  const n = spawnSync(process.execPath, [path.join(root, 'hooks', 'scripts', 'phase-reminder.mjs')], { input, encoding: 'utf8' });
+  assert.equal(r.stdout, n.stdout);
+});
+
+test('parity: the committed binary for this machine matches the Node hooks', (t) => {
+  const plat = hostPlatform();
+  if (!plat) return t.skip('no supported host');
+  const r = spawnSync(process.execPath, [path.join(root, 'hooks', 'rust', 'parity.mjs'), root, binPath(plat)], { encoding: 'utf8' });
+  assert.equal(r.status, 0, r.stdout.slice(-600));
+  assert.match(r.stdout, /parity: (\d+)\/\1 identical/);
+});
+
+test('README describes the prebuilt-binary default and the Node fallback', () => {
+  const r = read('README.md');
+  assert.match(r, /## Hooks: prebuilt Rust, Node as fallback/);
+  assert.match(r, /Node\.js is not needed/);
+  assert.match(r, /SHA256SUMS/);
+  assert.match(r, /update-binaries\.mjs/);
+  assert.doesNotMatch(r, /Optional: Rust hooks/);
+});

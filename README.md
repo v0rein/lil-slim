@@ -19,10 +19,7 @@ Skipped (OpenCode-only): `reflect`, `codemap`, `clonedeps`, the config skill,
 
 ## Install
 
-Requires Claude Code 2.1.275+. The guard hooks also need
-[Node.js 18+](https://nodejs.org) on `PATH`; without it the agents and skills
-still work, the hooks stay silent, and SessionStart tells you once that they
-are inactive.
+Requires Claude Code 2.1.275+. Hooks use a prebuilt binary on Linux, macOS and Windows (x64; arm64 on Linux and macOS), so no Node.js is required there. On other platforms the hooks fall back to Node.js 18+ on `PATH`; with neither, agents and skills still work, the hooks stay silent, and SessionStart tells you once.
 
 From GitHub (marketplace):
 
@@ -100,17 +97,18 @@ sessions and other plugins' agents are untouched. Loop-guard state lives in
 - **Permissions:** most testing used `--dangerously-skip-permissions`. One headless run in the default permission mode showed the same hook decisions. Interactive approval prompts, and how the path-rescue hook interacts with your `ask` rules, have not been exercised.
 - **Cost:** one large ticket that fans out to many agents cost roughly $12-17 in testing. Use `--max-budget-usd` to cap a session.
 
-## Optional: Rust hooks
+## Hooks: prebuilt Rust, Node as fallback
 
-The five guard hooks also exist as one small Rust binary (`hooks/rust`, about 1.1 MB). It is optional and off by default: `hooks/scripts/run.sh` uses it only when it finds `hooks/bin/lil-hook` (`.exe` on Windows) or `$LIL_HOOK_BIN`, and otherwise runs the Node scripts. With the binary present, Node is not needed for hooks at all.
+The five guard hooks ship as one small Rust binary per platform in `hooks/bin/` (`linux-x64`, `linux-arm64`, `darwin-arm64`, `darwin-x64`, `windows-x64`; about 1-1.5 MB each). `hooks/scripts/run.sh` picks the one for your OS and CPU. **Node.js is not needed** on those platforms.
 
-```bash
-cd hooks/rust && cargo build --release
-mkdir -p ../bin && cp target/release/lil-hook ../bin/   # lil-hook.exe on Windows
-node parity.mjs ../.. "$PWD/../bin/lil-hook"             # optional: compare against the Node hooks
-```
+- **Fallback:** on any other platform, or if the binary cannot start, `run.sh` runs the equivalent Node scripts (Node 18+). If neither is available the hooks stay silent and SessionStart tells you once.
+- **Never blocks:** a crashing or missing hook never produces an error exit.
+- **Same behavior:** `hooks/rust/parity.mjs` feeds 80 events to both implementations and requires identical output. CI runs it against the committed binaries natively on all five platforms.
+- **Integrity:** `hooks/bin/SHA256SUMS` lists every binary, and `hooks/bin/BUILD.json` records a hash of the exact Rust sources they were built from. A test fails if `hooks/rust` changes without the binaries being rebuilt.
+- **Built in CI, not on a laptop:** the `binaries` workflow builds all five from the locked sources (static where the platform allows; macOS binaries link only the system libSystem). Rebuild with the workflow, download the artifacts, then `node hooks/rust/update-binaries.mjs <artifacts-dir>` and review the change as a normal pull request.
+- **Trust:** the binaries are opaque. To audit one, build `hooks/rust` yourself (`cargo build --release --locked`) and compare its behavior with `parity.mjs`; byte-identical rebuilds are not guaranteed across toolchains. Remove `hooks/bin` to force the Node scripts.
 
-Measured on one Windows machine (30 runs each): about 59 ms per hook call through `run.sh` with the binary, versus about 148 ms with Node. Claude Code's own per-hook timing in a real session also includes its process launch, so expect a smaller absolute gain than the micro-benchmark. `parity.mjs` feeds 80 events to both implementations and requires identical output, and Rust-written loop-guard state is read by the Node script and the reverse. Build the binary per machine and do not commit it (`hooks/bin/` is git-ignored); updating the plugin does not rebuild it.
+Measured on one Windows machine (30 runs each): about 59 ms per hook call through `run.sh` with the binary versus about 148 ms with Node. Claude Code's own per-hook timing in a real session includes its process launch, so expect a smaller absolute gain.
 
 ## State directory
 

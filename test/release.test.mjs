@@ -43,7 +43,7 @@ test('every hook command degrades gracefully when node is missing', (t) => {
   }
 });
 
-test('SessionStart tells the user when node is missing', (t) => {
+test('SessionStart tells the user when neither a hook binary nor node is available', (t) => {
   const bash = findBash();
   if (!bash) return t.skip('no bash available');
   const group = json('hooks/hooks.json').hooks.SessionStart[0];
@@ -52,7 +52,8 @@ test('SessionStart tells the user when node is missing', (t) => {
   const r = spawnSync(bash, ['-c', cmd], {
     input: '{}',
     encoding: 'utf8',
-    env: { PATH: '/usr/bin:/bin' },
+    // an unsupported platform has no prebuilt binary, and PATH has no node
+    env: { PATH: '/usr/bin:/bin', LIL_HOOK_PLATFORM: 'plan9-mips' },
   });
   assert.equal(r.status, 0);
   assert.match(r.stdout, /Node\.js .*not found.*guard hooks are inactive/i);
