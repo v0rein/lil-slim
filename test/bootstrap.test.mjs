@@ -176,3 +176,14 @@ test('README gives measured numbers with their limits', () => {
 test('version is 0.3.0 for the new hook and skills', () => {
   assert.equal(JSON.parse(read('.claude-plugin/plugin.json')).version, '0.3.0');
 });
+
+test('README reports the resume and side-by-side checks with their limits', () => {
+  const r = read('README.md');
+  assert.match(r, /Resuming an interrupted plan/i);
+  assert.match(r, /3\/3/);
+  assert.match(r, /did not redo|no task was redone|nothing was redone/i);
+  assert.match(r, /uncommitted|mid-task/i);
+  assert.match(r, /Running next to superpowers/i);
+  assert.match(r, /one run/i);
+  assert.doesNotMatch(r, /did not test resuming/i);
+});

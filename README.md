@@ -130,7 +130,24 @@ Same fixtures and prompts, `lil-slim` with this hook versus `lil-slim` with the 
 | Plan with 2 tasks | 3/3, about $0.39 | 3/3, about $0.36 after the cost rules (about $0.84 before) |
 | Plan with 5 tasks | not measured | 3/3, $0.64 to $1.39 (only 1 of 3 runs used the ledger and review) |
 
-Limits: three runs per cell is a direction, not a statistic. Costs are in USD for one model and one machine. The 5-task result shows the cost rules do not reliably force the full process on bigger plans, and it did not test resuming an interrupted session. Two earlier 5-task attempts with 6 runs at once died silently for an unknown reason; the table uses a rerun with 2 at a time.
+Limits: three runs per cell is a direction, not a statistic. Costs are in USD for one model and one machine. The 5-task result shows the cost rules do not reliably force the full process on bigger plans. Two earlier 5-task attempts with 6 runs at once died silently for an unknown reason; the table uses a rerun with 2 at a time.
+
+### Resuming an interrupted plan
+
+A 5-task plan was stopped after task 3 (tasks 1 to 3 committed, tests green) and a new session was told only "the previous session was interrupted, continue". Three runs had the ledger from `sdd task-done`, three had it deleted.
+
+| | with ledger | without ledger |
+|---|---|---|
+| Finished all 5 tasks, every check passed | 3/3 | 3/3 |
+| Redid a finished task | no | no |
+| Cost | $0.32 to $0.88 | $0.22 to $0.62 |
+| Opened the ledger | 1 of 3 | n/a |
+
+Without the ledger the model worked out where it stood from git history and the test files, and no task was redone in any of the six runs, so in this setup the ledger did not change the outcome. Not tested: a session cut off mid-task with uncommitted changes, a plan whose commits do not map to tasks, and anything longer than 5 tasks. Three runs per cell is a direction, not a statistic.
+
+### Running next to superpowers
+
+Both plugins loaded in one session (one run): both SessionStart hooks ran and exited 0, both mandatory rules were injected, and both `brainstorming` skills were visible. The model picked `lil-slim:brainstorming`, asked a clarifying question and edited no code; it never mentioned the second rule. This is one run, not a stability claim. The advice above still stands: use one of the two.
 
 ## State directory
 
