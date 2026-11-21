@@ -10,7 +10,7 @@ Plain markdown, JSON and dependency-free Node scripts: no build, no
 | Piece | Where |
 |---|---|
 | Agents (17): `orchestrator`; specialists `explorer`, `oracle`, `designer`, `fixer`, `observer`; read-only audits `arbiter`, `hunter`, `janitor`, `paladin`, `proctor`; `validator`, `debugger`; docs `documenter`, `chronicler`; council seats `council`, `councillor` | `agents/*.md` |
-| Skills: `ai-estimates`, `council`, `deanchor`, `deepwork`, `simplify`, `step-back`, `verification-planning`, `worktrees` | `skills/*/SKILL.md` |
+| Skills (19): `ai-estimates`, `council`, `deanchor`, `deepwork`, `simplify`, `step-back`, `verification-planning`, `worktrees`; plus the plan-and-execute workflow `brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`, `dispatching-parallel-agents`, `systematic-debugging`, `test-driven-development`, `verification-before-completion`, `requesting-code-review`, `receiving-code-review`, `finishing-a-development-branch` | `skills/*/SKILL.md` |
 | Guard hooks: `phase-reminder`, `search-path-guard`, `tool-loop-guard`, `absolute-path-rescue` | `hooks/hooks.json`, `hooks/scripts/*.mjs` (launched via `run.sh`) |
 | MCP: `context7`, `gh_grep` (no API key) | `.mcp.json` |
 

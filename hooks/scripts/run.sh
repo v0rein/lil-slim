@@ -30,6 +30,16 @@ if [ -z "$bin" ] && [ -n "$plat" ]; then
   bin="$here/../bin/$plat/$exe"
 fi
 
+if [ "$script" = "sdd" ]; then
+  # Plan-execution helpers used by skills. User-visible commands: arguments are
+  # passed through, the exit status is real, and there is no Node fallback.
+  if [ -n "$bin" ] && [ -x "$bin" ]; then
+    exec "$bin" "$@"
+  fi
+  echo "lil-slim: no prebuilt binary for this platform (${plat:-unknown}); the sdd helper commands need it." >&2
+  exit 2
+fi
+
 if [ -n "$bin" ] && [ -x "$bin" ]; then
   "$bin" "$script"
   st=$?

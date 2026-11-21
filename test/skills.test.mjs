@@ -14,16 +14,27 @@ const names = readdirSync(skillsDir, { withFileTypes: true })
   .map((d) => d.name)
   .sort();
 
-test('exactly the eight portable skills ship', () => {
+test('exactly the nineteen shipped skills', () => {
   assert.deepEqual(names, [
     'ai-estimates',
+    'brainstorming',
     'council',
     'deanchor',
     'deepwork',
+    'dispatching-parallel-agents',
+    'executing-plans',
+    'finishing-a-development-branch',
+    'receiving-code-review',
+    'requesting-code-review',
     'simplify',
     'step-back',
+    'subagent-driven-development',
+    'systematic-debugging',
+    'test-driven-development',
+    'verification-before-completion',
     'verification-planning',
     'worktrees',
+    'writing-plans',
   ]);
 });
 

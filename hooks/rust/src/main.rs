@@ -9,12 +9,21 @@ mod loopguard;
 mod pathops;
 mod paths;
 mod phase;
+mod sdd;
 mod shell;
 
 use common::read_input;
 
 fn main() {
-    let hook = std::env::args().nth(1).unwrap_or_default();
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    if args.first().map(String::as_str) == Some("sdd") {
+        let out = sdd::run(&args[1..]);
+        use std::io::Write;
+        let _ = std::io::stdout().write_all(out.stdout.as_bytes());
+        let _ = std::io::stderr().write_all(out.stderr.as_bytes());
+        std::process::exit(out.code);
+    }
+    let hook = args.first().cloned().unwrap_or_default();
     let Some(input) = read_input() else { return };
     let out = match hook.as_str() {
         "phase-reminder" => phase::decide(&input),
