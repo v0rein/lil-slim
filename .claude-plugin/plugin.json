@@ -1,6 +1,6 @@
 {
   "name": "lil-slim",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Lightweight orchestrator + specialist workflow for Claude Code: 17 agents, 20 skills, 6 guard hooks. Ported from oh-my-opencode-slim.",
   "author": { "name": "v0rein" },
   "homepage": "https://github.com/v0rein/lil-slim",

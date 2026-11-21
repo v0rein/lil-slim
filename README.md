@@ -116,7 +116,21 @@ At session start a hook injects the `lil-slim:using-lil-slim` skill, the same wa
 
 - **Turn it off:** set `LIL_SLIM_SKILLS=off`. Skills stay available to call by name.
 - **With superpowers installed:** both plugins would inject a mandatory skill-first rule, so use one. Disable superpowers (`/plugin disable superpowers@claude-plugins-official`) or turn this off. The workflow skills here are adapted copies and do not need superpowers.
-- **Cost:** about 1.5 KB of extra context per session, and the mandatory wording makes small tasks slower: the skill itself says to skip its full process for trivial changes.
+- **Cost rules:** the skill ends with a short "Cost discipline" section: a plan that already says test-first does not also load the TDD skill, and small plans (up to 3 tasks) skip the ledger and workspace. This is a hint to the model, not a guarantee; it may still pick the full process. The ledger exists so work can resume after an interrupted or compacted session, so for long or risky plans keep it.
+
+### What was measured
+
+Same fixtures and prompts, `lil-slim` with this hook versus `lil-slim` with the real superpowers plugin, 3 runs per cell. The four-task set ran up to 6 runs at once and the two cost figures for the 2-task plan come from two separate batches; the 5-task plan ran 2 at a time. Pass/fail is checked by running the resulting code, except the "vague request" row, where I judged that asking before building is correct.
+
+| Task | superpowers | lil-slim hook |
+|---|---|---|
+| Vague feature request | asked first, 3/3 | asked first, 3/3 (0/3 before the hook) |
+| Failing test | 3/3 | 3/3 |
+| Small rename | 3/3, no skill | 3/3, no skill |
+| Plan with 2 tasks | 3/3, about $0.39 | 3/3, about $0.36 after the cost rules (about $0.84 before) |
+| Plan with 5 tasks | not measured | 3/3, $0.64 to $1.39 (only 1 of 3 runs used the ledger and review) |
+
+Limits: three runs per cell is a direction, not a statistic. Costs are in USD for one model and one machine. The 5-task result shows the cost rules do not reliably force the full process on bigger plans, and it did not test resuming an interrupted session. Two earlier 5-task attempts with 6 runs at once died silently for an unknown reason; the table uses a rerun with 2 at a time.
 
 ## State directory
 

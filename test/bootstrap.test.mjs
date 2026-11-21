@@ -119,3 +119,60 @@ test('README explains the automatic skill loading and how to avoid doubling it',
   assert.match(r, /LIL_SLIM_SKILLS/);
   assert.match(r, /disable superpowers|superpowers.*disable/i);
 });
+
+// ---- cost discipline -------------------------------------------------------
+const sk = () => read(SKILL);
+
+test('a plan that already says write-the-test-first does not load the TDD skill again', () => {
+  const t = sk();
+  assert.match(t, /Cost discipline/);
+  assert.match(t, /already (says|spells|contains).{0,60}(failing )?test/i);
+  assert.match(t, /do not load `lil-slim:test-driven-development`/i);
+});
+
+test('small plans skip the ledger and workspace', () => {
+  const t = sk();
+  assert.match(t, /(three|3) tasks or fewer|up to (three|3) tasks/i);
+  assert.match(t, /skip.{0,40}(ledger|workspace)/i);
+  assert.match(t, /sdd (workspace|task-start|task-done)/);
+});
+
+test('large plans and risky work keep the full process', () => {
+  const t = sk();
+  assert.match(t, /(four|4) or more|more than (three|3)|larger plans?|long plans?/i);
+  assert.match(t, /compaction|resume|interrupted/i);
+});
+
+test('the rule is stated as saving context, not as permission to skip verification', () => {
+  const t = sk();
+  assert.match(t, /never skip.{0,40}(verification|tests|review)|still (run|verify|review)/i);
+});
+
+test('the skill stays small even with the cost rules', () => {
+  assert.ok(Buffer.byteLength(sk()) < 5200, `using-lil-slim is ${Buffer.byteLength(sk())} bytes`);
+});
+
+test('the cost rules do not weaken the mandatory skill check', () => {
+  const t = sk();
+  assert.match(t, /ABSOLUTELY MUST invoke/);
+  assert.match(t, /1% chance/);
+});
+
+// ---- release notes for the skill-loading behaviour -----------------------
+test('README states honestly what the cost rules do and do not guarantee', () => {
+  const r = read('README.md');
+  assert.match(r, /Cost discipline|cost rules/i);
+  assert.match(r, /not guaranteed|may still|can still|is a hint|best effort/i);
+  assert.match(r, /ledger/i);
+  assert.match(r, /interrupted|resume/i);
+});
+
+test('README gives measured numbers with their limits', () => {
+  const r = read('README.md');
+  assert.match(r, /\$0\.\d\d/);
+  assert.match(r, /3 (runs|repeats|repetitions)|three runs/i);
+});
+
+test('version is 0.3.0 for the new hook and skills', () => {
+  assert.equal(JSON.parse(read('.claude-plugin/plugin.json')).version, '0.3.0');
+});

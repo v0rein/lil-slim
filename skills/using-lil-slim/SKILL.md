@@ -40,6 +40,14 @@ Skills set the process. The agents do the work: dispatch them with the Agent too
 | High-stakes decision | `lil-slim:council` | `councillor`, `council` |
 | Parallel or risky work needs isolation | `lil-slim:worktrees` | none |
 
+## Cost discipline
+
+Skills and their ledgers cost context on every later call. Spend it where it pays. You still run the tests, review, and verify; this only avoids doing the same thing twice.
+
+- **A plan that already says to write the failing test first**, run it, then implement, already contains the TDD loop. Follow the plan and do not load `lil-slim:test-driven-development`.
+- **Small plans, up to 3 tasks:** skip the `sdd workspace`, `task-start`, and `task-done` ledger. Work the tasks in order, commit each, run the tests yourself, and review once at the end.
+- **4 or more tasks, or any plan that may be interrupted** (long running, risky, spans compaction): keep the full process with the ledger so work can resume.
+
 ## Skill Priority
 
 When several skills apply, process skills come first (brainstorming, systematic-debugging), then implementation skills.
