@@ -70,6 +70,9 @@ jobs:
       - name: Parity with the Node hooks
         shell: bash
         run: node hooks/rust/parity.mjs "$PWD" "$PWD/hooks/bin/${{ matrix.platform }}/${{ matrix.exe }}"
+      - name: sdd helpers match the original bash scripts
+        shell: bash
+        run: node hooks/rust/sdd-parity.mjs "$PWD/hooks/rust/tests/oracle" "$PWD/hooks/bin/${{ matrix.platform }}/${{ matrix.exe }}"
       - name: Prove run.sh uses the binary and not node
         shell: bash
         run: |

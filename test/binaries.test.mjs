@@ -252,3 +252,17 @@ test('workflow files keep every line inside its block (no stray column-0 text)',
     });
   }
 });
+
+test('CI runs the sdd parity against the committed binary on every platform', () => {
+  const y = read('.github/workflows/test.yml');
+  assert.match(y, /sdd-parity\.mjs/);
+  assert.match(y, /rust\/tests\/oracle/);
+});
+
+test('sdd parity: the committed binary for this machine matches the original bash scripts', (t) => {
+  const plat = hostPlatform();
+  if (!plat || !findBash()) return t.skip('no supported host or bash');
+  const r = spawnSync(process.execPath, [path.join(root, 'hooks', 'rust', 'sdd-parity.mjs'), path.join(root, 'hooks', 'rust', 'tests', 'oracle'), binPath(plat)], { encoding: 'utf8' });
+  assert.equal(r.status, 0, r.stdout.slice(-900));
+  assert.match(r.stdout, /sdd parity: (\d+)\/\1 identical/);
+});
