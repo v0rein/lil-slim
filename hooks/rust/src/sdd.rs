@@ -272,6 +272,17 @@ fn shaped_heading(line: &str) -> bool {
     !id.is_empty() && id.bytes().any(|c| c.is_ascii_digit())
 }
 
+/// The text of a plan line as it goes into the brief. The original script uses
+/// awk, which keeps a trailing CR on Linux and macOS but loses it on Windows
+/// (Git Bash opens the file in text mode). Match each platform's original.
+fn brief_line(raw: &str) -> &str {
+    if cfg!(windows) {
+        raw.strip_suffix('\r').unwrap_or(raw)
+    } else {
+        raw
+    }
+}
+
 pub fn task_brief(args: &[String]) -> Out {
     let (rest, dir) = match take_dir(args) {
         Ok(v) => v,
@@ -340,7 +351,7 @@ pub fn task_brief(args: &[String]) -> Out {
             }
         }
         if intask {
-            brief.push_str(line);
+            brief.push_str(brief_line(raw));
             brief.push('\n');
             found = true;
         }
@@ -561,6 +572,16 @@ mod tests {
         assert_eq!(task_heading("Task 1"), None);
         assert_eq!(task_heading("##Task 1"), None);
         assert_eq!(task_heading("#### Task 7a"), Some((4, "7a")));
+    }
+
+    #[test]
+    fn brief_lines_follow_each_platforms_awk() {
+        if cfg!(windows) {
+            assert_eq!(brief_line("a\r"), "a");
+        } else {
+            assert_eq!(brief_line("a\r"), "a\r");
+        }
+        assert_eq!(brief_line("a"), "a");
     }
 
     #[test]
