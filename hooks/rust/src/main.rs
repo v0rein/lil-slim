@@ -11,6 +11,7 @@ mod paths;
 mod phase;
 mod sdd;
 mod shell;
+mod skillboot;
 
 use common::read_input;
 
@@ -27,6 +28,7 @@ fn main() {
     let Some(input) = read_input() else { return };
     let out = match hook.as_str() {
         "phase-reminder" => phase::decide(&input),
+        "skill-bootstrap" => skillboot::decide(&input),
         "search-path-guard" => paths::search_guard(&input),
         "absolute-path-rescue" => paths::rescue(&input),
         "tool-loop-guard" => loopguard::decide(&input),

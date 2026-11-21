@@ -30,7 +30,7 @@ pub fn agent_name(input: &Value) -> Option<String> {
     }
 }
 
-fn plugin_root() -> PathBuf {
+pub fn plugin_root() -> PathBuf {
     if let Some(r) = std::env::var_os("CLAUDE_PLUGIN_ROOT") {
         return PathBuf::from(r);
     }

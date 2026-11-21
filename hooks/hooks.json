@@ -10,6 +10,16 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/run.sh\" skill-bootstrap",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "PreToolUse": [

@@ -14,7 +14,7 @@ const names = readdirSync(skillsDir, { withFileTypes: true })
   .map((d) => d.name)
   .sort();
 
-test('exactly the nineteen shipped skills', () => {
+test('exactly the twenty shipped skills', () => {
   assert.deepEqual(names, [
     'ai-estimates',
     'brainstorming',
@@ -31,6 +31,7 @@ test('exactly the nineteen shipped skills', () => {
     'subagent-driven-development',
     'systematic-debugging',
     'test-driven-development',
+    'using-lil-slim',
     'verification-before-completion',
     'verification-planning',
     'worktrees',

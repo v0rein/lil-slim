@@ -28,6 +28,12 @@ add('phase: orchestrator', 'phase-reminder', { hook_event_name: 'SessionStart', 
 add('phase: explorer', 'phase-reminder', { hook_event_name: 'SessionStart', agent_type: A('explorer') });
 add('phase: foreign prefix', 'phase-reminder', { hook_event_name: 'SessionStart', agent_type: 'other:orchestrator' });
 add('phase: bare', 'phase-reminder', { hook_event_name: 'SessionStart', agent_type: 'orchestrator' });
+// skill-bootstrap reads the skill file from the plugin root (Node: next to its own script; Rust: CLAUDE_PLUGIN_ROOT)
+for (const [n, over] of [['orchestrator', { agent_type: A('orchestrator') }], ['plain session', { agent_type: undefined }], ['explorer', { agent_type: A('explorer') }], ['foreign prefix', { agent_type: 'other:orchestrator' }], ['bare orchestrator', { agent_type: 'orchestrator' }]]) {
+  add(`bootstrap: ${n}`, 'skill-bootstrap', { hook_event_name: 'SessionStart', ...over });
+}
+add('bootstrap: wrong event', 'skill-bootstrap', { hook_event_name: 'PreToolUse', agent_type: A('orchestrator') });
+for (const v of ['off', 'OFF', '0', 'false', 'no', 'on', '']) add(`bootstrap: LIL_SLIM_SKILLS=${v || '(empty)'}`, 'skill-bootstrap', { hook_event_name: 'SessionStart' }, { LIL_SLIM_SKILLS: v });
 add('phase: wrong event', 'phase-reminder', { hook_event_name: 'PreToolUse', agent_type: A('orchestrator') });
 
 for (const [n, tool, p] of [['missing', 'Grep', 'nope-dir'], ['existing', 'Grep', 'src'], ['file-as-dir', 'Glob', 'f.txt/sub'], ['undefined-glob', 'Glob', 'undefined'], ['empty', 'Grep', ''], ['absolute-missing', 'Grep', path.join(ws, 'gone')]]) {

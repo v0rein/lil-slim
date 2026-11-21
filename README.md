@@ -10,8 +10,8 @@ Plain markdown, JSON and dependency-free Node scripts: no build, no
 | Piece | Where |
 |---|---|
 | Agents (17): `orchestrator`; specialists `explorer`, `oracle`, `designer`, `fixer`, `observer`; read-only audits `arbiter`, `hunter`, `janitor`, `paladin`, `proctor`; `validator`, `debugger`; docs `documenter`, `chronicler`; council seats `council`, `councillor` | `agents/*.md` |
-| Skills (19): `ai-estimates`, `council`, `deanchor`, `deepwork`, `simplify`, `step-back`, `verification-planning`, `worktrees`; plus the plan-and-execute workflow `brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`, `dispatching-parallel-agents`, `systematic-debugging`, `test-driven-development`, `verification-before-completion`, `requesting-code-review`, `receiving-code-review`, `finishing-a-development-branch` | `skills/*/SKILL.md` |
-| Guard hooks: `phase-reminder`, `search-path-guard`, `tool-loop-guard`, `absolute-path-rescue` | `hooks/hooks.json`, `hooks/scripts/*.mjs` (launched via `run.sh`) |
+| Skills (20): `ai-estimates`, `council`, `deanchor`, `deepwork`, `simplify`, `step-back`, `verification-planning`, `worktrees`; plus the plan-and-execute workflow `brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`, `dispatching-parallel-agents`, `systematic-debugging`, `test-driven-development`, `verification-before-completion`, `requesting-code-review`, `receiving-code-review`, `finishing-a-development-branch`; the session starter `using-lil-slim` | `skills/*/SKILL.md` |
+| Hooks: `skill-bootstrap`, `phase-reminder`, `search-path-guard`, `tool-loop-guard`, `absolute-path-rescue`, `readonly-shell-guard` | `hooks/hooks.json`, `hooks/scripts/*.mjs` (launched via `run.sh`) |
 | MCP: `context7`, `gh_grep` (no API key) | `.mcp.json` |
 
 Skipped (OpenCode-only): `reflect`, `codemap`, `clonedeps`, the config skill,
@@ -109,6 +109,14 @@ The five guard hooks ship as one small Rust binary per platform in `hooks/bin/` 
 - **Trust:** the binaries are opaque. To audit one, build `hooks/rust` yourself (`cargo build --release --locked`) and compare its behavior with `parity.mjs`; byte-identical rebuilds are not guaranteed across toolchains. Remove `hooks/bin` to force the Node scripts.
 
 Measured on one Windows machine (30 runs each): about 59 ms per hook call through `run.sh` with the binary versus about 148 ms with Node. Claude Code's own per-hook timing in a real session includes its process launch, so expect a smaller absolute gain.
+
+## Skills load automatically
+
+At session start a hook injects the `lil-slim:using-lil-slim` skill, the same way the original superpowers plugin does: it tells the model to check for a matching skill before any response, and it maps each skill to the lil-slim agent that does the work (brainstorming to `oracle` and `designer`, plan execution to `fixer`, `arbiter` and `validator`, debugging to `explorer` and `debugger`, and so on). It applies to the orchestrator and to a plain session; subagents are left alone. The text comes from `skills/using-lil-slim/SKILL.md`, so editing that file changes it.
+
+- **Turn it off:** set `LIL_SLIM_SKILLS=off`. Skills stay available to call by name.
+- **With superpowers installed:** both plugins would inject a mandatory skill-first rule, so use one. Disable superpowers (`/plugin disable superpowers@claude-plugins-official`) or turn this off. The workflow skills here are adapted copies and do not need superpowers.
+- **Cost:** about 1.5 KB of extra context per session, and the mandatory wording makes small tasks slower: the skill itself says to skip its full process for trivial changes.
 
 ## State directory
 
