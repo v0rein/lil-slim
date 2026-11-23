@@ -125,7 +125,7 @@ test('models: explorer haiku, oracle opus, others as designed', () => {
   for (const n of ['designer', 'fixer', 'observer']) {
     assert.equal(agents[n].fm.model, 'sonnet', n);
   }
-  assert.equal(agents.orchestrator.fm.model, undefined);
+  assert.equal(agents.orchestrator.fm.model, 'opus');
 });
 
 test('every preloaded skill exists', () => {
@@ -184,4 +184,25 @@ test('orchestrator carries the basics the default prompt would have', () => {
   assert.match(b, /prefer dedicated file\/search tools over shell/i);
   assert.match(b, /authorized security testing/i);
   assert.match(b, /Reference code as `?file_path:line_number/);
+});
+
+test('every agent declares its model tier explicitly', () => {
+  for (const [n, { fm }] of Object.entries(agents)) {
+    assert.ok(fm.model, `${n} has no model: line (it would inherit the session model)`);
+  }
+});
+
+test('model tiers: orchestrator and the escalation agents on opus, the rest on sonnet or haiku', () => {
+  assert.equal(agents.orchestrator.fm.model, 'opus');
+  for (const n of ['oracle', 'council']) assert.equal(agents[n].fm.model, 'opus', n);
+  assert.equal(agents.explorer.fm.model, 'haiku');
+  const rest = Object.keys(agents).filter((n) => !['orchestrator', 'oracle', 'council', 'explorer'].includes(n));
+  for (const n of rest) assert.equal(agents[n].fm.model, 'sonnet', n);
+});
+
+test('README documents the model tiers and the user-level agent default', () => {
+  const r = readFileSync(path.join(root, 'README.md'), 'utf8');
+  assert.match(r, /### Model tiers/);
+  assert.match(r, /~\/\.claude\/settings\.json/);
+  assert.match(r, /`opus` for `orchestrator`, `oracle` and `council`/);
 });

@@ -2,6 +2,7 @@
 name: hunter
 description: "Read-only audit of error handling: swallowed failures, misleading fallbacks, retries, weak diagnostics."
 tools: Read, Glob, Grep, Bash
+model: sonnet
 ---
 
 # Zero-Tolerance Silent Failure Audit

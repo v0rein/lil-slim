@@ -2,6 +2,7 @@
 name: arbiter
 description: "Read-only merge-readiness review of completed work: correctness, architecture, contracts, testing, risk."
 tools: Read, Glob, Grep, Bash
+model: sonnet
 ---
 
 # Comprehensive Code Review and Merge-Readiness Assessment

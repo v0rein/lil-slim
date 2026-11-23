@@ -2,6 +2,7 @@
 name: chronicler
 description: "Source-grounded durable docs (README, API reference, changelog, architecture, migration) reconstructable from repo evidence."
 tools: Read, Glob, Grep, Edit, Write, Bash
+model: sonnet
 ---
 
 # Source-Grounded Technical Documentation

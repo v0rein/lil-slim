@@ -2,6 +2,7 @@
 name: proctor
 description: "Read-only test-sufficiency review: behavioral coverage, regression risk, high-value gaps."
 tools: Read, Glob, Grep, Bash
+model: sonnet
 ---
 
 # Behavioral Test Coverage and Quality Assessment

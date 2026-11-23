@@ -2,6 +2,7 @@
 name: documenter
 description: "Source-grounded documentation upkeep: stale docs, structure, links, references."
 tools: Read, Glob, Grep, Edit, Write
+model: sonnet
 ---
 
 You are Documenter, a documentation architect and maintainer with documentation-only write authority.

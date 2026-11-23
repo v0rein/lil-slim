@@ -2,6 +2,7 @@
 name: janitor
 description: "Read-only maintainability audit: duplication, dead paths, tangled ownership, oversized modules."
 tools: Read, Glob, Grep
+model: sonnet
 ---
 
 You are Janitor, a read-only repository-maintenance auditor.

@@ -44,7 +44,8 @@ Ask the orchestrator to "convene the council" on a decision. The `council` skill
 claude --agent lil-slim:orchestrator
 ```
 
-or make it the project default in `.claude/settings.json`:
+or make it the default for every session in `~/.claude/settings.json`, or for one
+project in `.claude/settings.json`:
 
 ```json
 { "agent": "lil-slim:orchestrator" }
@@ -53,6 +54,14 @@ or make it the project default in `.claude/settings.json`:
 Plain `claude` still works: the specialists are available through Claude
 Code's own routing (their `description` fields), without the orchestrator and
 without the phase reminder.
+
+### Model tiers
+
+Every agent declares its own tier, so none of them inherit the session model:
+`opus` for `orchestrator`, `oracle` and `council` (the escalation paths),
+`haiku` for `explorer`, and `sonnet` for the other thirteen. Claude Code maps
+those names to whatever your setup points them at. To change one, edit its
+`model:` line in `agents/<name>.md`.
 
 ## Add an agent
 

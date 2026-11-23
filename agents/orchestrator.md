@@ -1,6 +1,7 @@
 ---
 name: orchestrator
 description: Workflow manager that plans, delegates to specialists, reconciles their results, and verifies. Run as the main agent with `claude --agent lil-slim:orchestrator`.
+model: opus
 ---
 
 <Role>
