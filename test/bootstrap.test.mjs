@@ -173,8 +173,12 @@ test('README gives measured numbers with their limits', () => {
   assert.match(r, /3 (runs|repeats|repetitions)|three runs/i);
 });
 
-test('version is 0.3.0 for the new hook and skills', () => {
-  assert.equal(JSON.parse(read('.claude-plugin/plugin.json')).version, '0.3.0');
+test('version is a valid semver at or above 0.3.0, the release that added the hook and skills', () => {
+  const v = JSON.parse(read('.claude-plugin/plugin.json')).version;
+  const m = /^(\d+)\.(\d+)\.(\d+)$/.exec(v);
+  assert.ok(m, `not a plain semver: ${v}`);
+  const [maj, min] = [Number(m[1]), Number(m[2])];
+  assert.ok(maj > 0 || min >= 3, `version ${v} is below 0.3.0`);
 });
 
 test('README reports the resume and side-by-side checks with their limits', () => {
