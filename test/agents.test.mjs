@@ -36,14 +36,14 @@ const agents = Object.fromEntries(
   files.map((f) => [f.slice(0, -3), parse(path.join(agentsDir, f))]),
 );
 
-const CORE = ['designer', 'explorer', 'fixer', 'observer', 'oracle', 'orchestrator'];
+const CORE = ['designer', 'explorer', 'fixer', 'observer', 'oracle', 'orchestrator', 'skeptic'];
 const AUDIT = ['arbiter', 'hunter', 'janitor', 'paladin', 'proctor'];
 const DOCS = ['chronicler', 'documenter'];
-const UTIL = ['debugger', 'validator'];
+const UTIL = ['debugger', 'validator', 'fast-generic'];
 const COUNCIL = ['council', 'councillor'];
 const ALL = [...CORE, ...AUDIT, ...DOCS, ...UTIL, ...COUNCIL].sort();
 
-test('the shipped agent set is exactly the expected seventeen', () => {
+test('the shipped agent set is exactly the expected nineteen', () => {
   assert.deepEqual(Object.keys(agents).sort(), ALL);
 });
 
@@ -205,4 +205,37 @@ test('README documents the model tiers and the user-level agent default', () => 
   assert.match(r, /### Model tiers/);
   assert.match(r, /~\/\.claude\/settings\.json/);
   assert.match(r, /`opus` for `orchestrator`, `oracle` and `council`/);
+});
+
+test('skeptic challenges proposals and stays read-only', () => {
+  const { fm, body } = agents.skeptic;
+  assert.equal(fm.model, 'sonnet');
+  assert.equal(fm.tools, 'Read, Glob, Grep');
+  assert.match(body, /steel-man/i);
+  assert.match(body, /failure scenario/i);
+  assert.match(body, /verdict/i);
+  assert.match(body, /do not dispatch other agents/i);
+});
+
+test('fast-generic runs commands and may commit, but never rewrites history', () => {
+  const { fm, body } = agents['fast-generic'];
+  assert.equal(fm.model, 'sonnet');
+  assert.equal(fm.tools, 'Read, Glob, Grep, Bash');
+  assert.match(body, /PASS, FAIL, or BLOCKED/);
+  assert.match(body, /Never amend, rebase, reset --hard/);
+  assert.match(body, /do not dispatch other agents/i);
+});
+
+test('fast-generic is not in the read-only shell guard, so it can commit', async () => {
+  const { READONLY_SHELL_AGENTS } = await import('../hooks/scripts/readonly-shell-guard.mjs');
+  assert.ok(!READONLY_SHELL_AGENTS.has('fast-generic'));
+  assert.ok(!READONLY_SHELL_AGENTS.has('skeptic'), 'skeptic has no Bash, so the guard is irrelevant');
+});
+
+test('third-party notices credit both new agents and their authors', () => {
+  const n = readFileSync(path.join(root, 'THIRD_PARTY_NOTICES.md'), 'utf8');
+  assert.match(n, /\bskeptic\b/);
+  assert.match(n, /\bfast-generic\b/);
+  assert.match(n, /mhenke/);
+  assert.match(n, /github\.com\/mhenke/);
 });

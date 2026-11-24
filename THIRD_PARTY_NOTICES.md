@@ -71,6 +71,7 @@ SOFTWARE.
 Community agents adapted from https://github.com/alvinunreal/oh-my-opencode-marketplace (MIT):
 
 - arbiter: capyBearista (https://github.com/capyBearista), MIT, from capybearista/arbiter
+- fast-generic: Alvin, MIT, from alvin/fast-generic
 - chronicler: capyBearista (https://github.com/capyBearista), MIT, from capybearista/chronicler
 - debugger: Alvin, MIT, from alvin/debugger
 - documenter: Alvin, MIT, from alvin/documenter
@@ -78,6 +79,7 @@ Community agents adapted from https://github.com/alvinunreal/oh-my-opencode-mark
 - janitor: hbollon (https://github.com/hbollon), MIT, from alvin/janitor
 - paladin: stevio2d (https://github.com/stevio2d), MIT, from alvin/paladin
 - proctor: capyBearista (https://github.com/capyBearista), MIT, from capybearista/proctor
+- skeptic: mhenke (https://github.com/mhenke), MIT, from mhenke/skeptic
 - validator: Alvin, MIT, from alvin/validator
 
 Each is MIT licensed; see the upstream repositories for the full license text. The marketplace

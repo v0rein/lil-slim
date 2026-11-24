@@ -9,7 +9,7 @@ Plain markdown, JSON and dependency-free Node scripts: no build, no
 
 | Piece | Where |
 |---|---|
-| Agents (17): `orchestrator`; specialists `explorer`, `oracle`, `designer`, `fixer`, `observer`; read-only audits `arbiter`, `hunter`, `janitor`, `paladin`, `proctor`; `validator`, `debugger`; docs `documenter`, `chronicler`; council seats `council`, `councillor` | `agents/*.md` |
+| Agents (19): `orchestrator`; specialists `explorer`, `oracle`, `designer`, `fixer`, `observer`, `skeptic`; read-only audits `arbiter`, `hunter`, `janitor`, `paladin`, `proctor`; execution `validator`, `fast-generic`, `debugger`; docs `documenter`, `chronicler`; council seats `council`, `councillor` | `agents/*.md` |
 | Skills (20): `ai-estimates`, `council`, `deanchor`, `deepwork`, `simplify`, `step-back`, `verification-planning`, `worktrees`; plus the plan-and-execute workflow `brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`, `dispatching-parallel-agents`, `systematic-debugging`, `test-driven-development`, `verification-before-completion`, `requesting-code-review`, `receiving-code-review`, `finishing-a-development-branch`; the session starter `using-lil-slim` | `skills/*/SKILL.md` |
 | Hooks: `skill-bootstrap`, `phase-reminder`, `search-path-guard`, `tool-loop-guard`, `absolute-path-rescue`, `readonly-shell-guard` | `hooks/hooks.json`, `hooks/scripts/*.mjs` (launched via `run.sh`) |
 | MCP: `context7`, `gh_grep` (no API key) | `.mcp.json` |
@@ -59,7 +59,7 @@ without the phase reminder.
 
 Every agent declares its own tier, so none of them inherit the session model:
 `opus` for `orchestrator`, `oracle` and `council` (the escalation paths),
-`haiku` for `explorer`, and `sonnet` for the other thirteen. Claude Code maps
+`haiku` for `explorer`, and `sonnet` for the other fifteen. Claude Code maps
 those names to whatever your setup points them at. To change one, edit its
 `model:` line in `agents/<name>.md`.
 

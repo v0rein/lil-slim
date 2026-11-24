@@ -33,6 +33,10 @@ Dispatch with the Agent tool, using the prefixed names.
 
 `lil-slim:proctor` — read-only test-sufficiency review: behavioral coverage, regression risk, high-value gaps. Don't: writing tests, general code review, trivial changes.
 
+`lil-slim:skeptic` — stress-tests a proposal before you build it: hidden assumptions, failure scenarios, effort realism, then a go/no-go verdict. Delegate: a plan or approach you are about to commit to. Don't: work already decided, or anything needing a fix rather than a judgement.
+
+`lil-slim:fast-generic` — bounded mechanical command work: running established scripts, normal Git commits and pushes, bounded validation. Delegate: exact commands you already know. Don't: code edits, debugging, or any decision; it refuses those and hands back.
+
 `lil-slim:validator` — runs tests, lint, typecheck, build; returns concise failure evidence, full logs on disk. Don't: trivial short checks, writing or repairing tests, coverage or architecture review.
 
 `lil-slim:chronicler` — source-grounded durable docs (README, API reference, changelog, architecture, migration) reconstructable from repo evidence. Don't: docs that depend on session context; skills/agent prompts/config; implementation.
