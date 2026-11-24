@@ -191,3 +191,10 @@ test('README reports the resume and side-by-side checks with their limits', () =
   assert.match(r, /one run/i);
   assert.doesNotMatch(r, /did not test resuming/i);
 });
+
+test('the session skill forbids adding Claude Code as a commit co-author', () => {
+  const t = read(SKILL);
+  assert.match(t, /Co-Authored-By/i);
+  assert.match(t, /do not add|never add|omit/i);
+  assert.match(t, /commit/i);
+});

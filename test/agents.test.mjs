@@ -239,3 +239,18 @@ test('third-party notices credit both new agents and their authors', () => {
   assert.match(n, /mhenke/);
   assert.match(n, /github\.com\/mhenke/);
 });
+
+test('every agent that can commit is told not to add a Claude Code co-author', () => {
+  const guard = new Set(['arbiter', 'hunter', 'proctor']);
+  const committers = Object.entries(agents).filter(([n, { fm }]) => {
+    if (guard.has(n)) return false;
+    const allow = fm.tools === undefined ? null : String(fm.tools);
+    const deny = String(fm.disallowedTools ?? '');
+    return allow !== null ? /\bBash\b/.test(allow) : !/\bBash\b/.test(deny);
+  });
+  assert.ok(committers.length >= 5, 'expected several agents with Bash');
+  // fast-generic commits as its job, so it carries the rule itself; the others
+  // inherit it from the session skill, which this suite checks separately.
+  assert.match(agents['fast-generic'].body, /Co-Authored-By/i);
+  assert.match(agents['fast-generic'].body, /do not add|never add|omit/i);
+});

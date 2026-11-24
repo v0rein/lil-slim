@@ -48,6 +48,10 @@ Skills and their ledgers cost context on every later call. Spend it where it pay
 - **Small plans, up to 3 tasks:** skip the `sdd workspace`, `task-start`, and `task-done` ledger. Work the tasks in order, commit each, run the tests yourself, and review once at the end.
 - **4 or more tasks, or any plan that may be interrupted** (long running, risky, spans compaction): keep the full process with the ledger so work can resume.
 
+## Commits
+
+When you or an agent makes a commit, write the message and nothing else: do not add a `Co-Authored-By: Claude Code` trailer or any other attribution line. The repository's own contributor list stays the author's.
+
 ## Skill Priority
 
 When several skills apply, process skills come first (brainstorming, systematic-debugging), then implementation skills.
