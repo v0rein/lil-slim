@@ -25,8 +25,7 @@ for (const f of walk(oracle)) {
   writeFileSync(f, readFileSync(f, 'utf8').replace(/\r/g, '').replaceAll('.superpowers/sdd', '.lil-slim/sdd'));
   chmodSync(f, 0o755);
 }
-const EXECUTING = new Set(['task-start', 'task-done']);
-const O = (name) => fwd(path.join(oracle, EXECUTING.has(name) ? 'executing-plans' : 'subagent-driven-development', 'scripts', name));
+const O = (name) => fwd(path.join(oracle, 'subagent-driven-development', 'scripts', name));
 
 // ---- fixture repo --------------------------------------------------------
 const root = realpathSync.native(mkdtempSync(path.join(tmpdir(), 'sdd-repo-')));
@@ -160,19 +159,7 @@ compare('review-package empty range', 'review-package', 'review-package', [P('pl
 compare('review-package missing plan', 'review-package', 'review-package', ['docs/nope.md', c1, c3]);
 compare('review-package usage', 'review-package', 'review-package', [P('plan'), c1]);
 
-compare('task-start', 'task-start', 'task-start', [P('plan'), '2']);
-compare('task-start bad task', 'task-start', 'task-start', [P('plan'), '99']);
-compare('task-start usage', 'task-start', 'task-start', [P('plan')]);
-compare('task-start fenced unclosed', 'task-start', 'task-start', [P('unclosed'), '1']);
 
-const NODE = 'node';
-compare('task-done pass', 'task-done', 'task-done', [P('plan'), '1', c1, '--', NODE, '-e', 'console.log("3 pass")']);
-compare('task-done fail', 'task-done', 'task-done', [P('plan'), '1', c1, '--', NODE, '-e', 'console.log("boom");process.exit(3)']);
-compare('task-done quoted arg', 'task-done', 'task-done', [P('plan'), '2', c2, '--', NODE, '-e', 'console.log("a b | c")']);
-compare('task-done long output', 'task-done', 'task-done', [P('plan'), '1', c1, '--', NODE, '-e', 'for(let i=1;i<=9;i++)console.log("line "+i)']);
-compare('task-done no output', 'task-done', 'task-done', [P('plan'), '1', c1, '--', NODE, '-e', '0']);
-compare('task-done bad BASE', 'task-done', 'task-done', [P('plan'), '1', 'deadbeef', '--', NODE, '-e', '0']);
-compare('task-done usage', 'task-done', 'task-done', [P('plan'), '1', c1, NODE]);
 
 const bad = results.filter((r) => !r.ok);
 console.log(`sdd parity: ${results.length - bad.length}/${results.length} identical`);

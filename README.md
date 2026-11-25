@@ -143,7 +143,7 @@ Limits: three runs per cell is a direction, not a statistic. Costs are in USD fo
 
 ### Resuming an interrupted plan
 
-A 5-task plan was stopped after task 3 (tasks 1 to 3 committed, tests green) and a new session was told only "the previous session was interrupted, continue". Three runs had the ledger from `sdd task-done`, three had it deleted.
+A 5-task plan was stopped after task 3 (tasks 1 to 3 committed, tests green) and a new session was told only "the previous session was interrupted, continue". Three runs had the ledger (since removed: `sdd task-done`), three had it deleted.
 
 | | with ledger | without ledger |
 |---|---|---|
