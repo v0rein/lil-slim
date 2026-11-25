@@ -1,15 +1,13 @@
----
-name: deepwork
-description: High-cost orchestrator workflow for large, high-risk, multi-phase coding efforts with meaningful dependencies and review gates. Do not activate for routine multi-file changes.
----
+# Multi-phase work
 
-# Deepwork
-
-Deepwork is an orchestrator workflow for heavy coding sessions: a whole
+Read this when the effort is too large for one plan: a whole
 product or subsystem, cross-cutting architectural change, unsafe-to-partially-
 ship migration, or sustained coordination across specialist lanes. Never infer
 it merely because a task touches multiple files; skip it for trivial edits,
 quick docs changes, simple bug fixes, or routine bounded features.
+
+Each pass is one plan: write it with lil-slim:writing-plans and run it with
+the main SDD process. This file adds only what sits above the plans.
 
 ## Work Like a Painter
 
@@ -97,11 +95,11 @@ At the end of each pass:
 
 ## State
 
-`.lil-slim/deepwork/` is the resume index for Deepwork-owned state, not a second
+`.lil-slim/phases/` is the resume index for multi-phase state, not a second
 workspace for process documents. Keep it small and current; it exists to
 resume after compaction, not to log activity.
 
-- **Progress file** `.lil-slim/deepwork/<task-slug>/progress.md`, rewritten in
+- **Progress file** `.lil-slim/phases/<task-slug>/progress.md`, rewritten in
   place, at most about 40 lines of plain prose: first line `status: active`
   (or `status: completed`), then pass and its goal,
   next step, constraints and decisions, running lanes (one line each), a concise
@@ -110,29 +108,29 @@ resume after compaction, not to log activity.
   project paths. There is no per-session head: you do not know your session
   id, so keep the task slug in the conversation and never modify another
   task's folder.
-- Other Deepwork process files do not belong under `.lil-slim/deepwork`. Durable
+- Other multi-phase process files do not belong under `.lil-slim/phases`. Durable
   verdicts, research, and decisions go to the project's existing tracked
   documentation paths. Generated assets stay where their producing script or
   path contract requires them.
 - Update state at pass transitions, decisions, and blockers — not after every
   lane.
 
-Setup: before creating any deepwork file, ensure `.gitignore` contains
-`.lil-slim/deepwork/`, adding it only if missing. Claim a new task with
-`mkdir -p .lil-slim/deepwork` then a plain `mkdir .lil-slim/deepwork/<task-slug>`;
+Setup: before creating any multi-phase file, ensure `.gitignore` contains
+`.lil-slim/phases/`, adding it only if missing. Claim a new task with
+`mkdir -p .lil-slim/phases` then a plain `mkdir .lil-slim/phases/<task-slug>`;
 if it already exists and its progress file says `status: active`, ask the user
 whether to resume it or pick another slug.
 
 Resume: read the progress file of your task slug, then only the References it
 points to. After compaction with the slug lost, list
-`.lil-slim/deepwork/*/progress.md` with `status: active`; if exactly one, adopt it,
+`.lil-slim/phases/*/progress.md` with `status: active`; if exactly one, adopt it,
 otherwise ask the user which. Nothing else.
 
 ## Completion
 
 Rewrite the progress file as a tombstone of at most 15 lines: first line
 `status: completed`, then the final outcome, pointers to key deliverables,
-the remaining known issues, and the date. Then delete only the Deepwork-owned
+the remaining known issues, and the date. Then delete only the multi-phase
 progress state when no longer needed, or follow the project's own tombstone
 convention.
 Do not delete producer-owned asset directories. Finish with final validation

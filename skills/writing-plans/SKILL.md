@@ -56,7 +56,7 @@ independently testable deliverable.
 ```markdown
 # [Feature Name] Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use lil-slim:subagent-driven-development (recommended) or lil-slim:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use lil-slim:subagent-driven-development to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** [One sentence describing what this builds]
 
@@ -201,4 +201,4 @@ them to review the plan and choose an execution method before implementation.
 - **REQUIRED SUB-SKILL:** Use lil-slim:subagent-driven-development
 
 **If Native chosen:**
-- **REQUIRED SUB-SKILL:** Use lil-slim:executing-plans
+- Implement the tasks yourself in order with the same lil-slim:subagent-driven-development workspace and ledger, then one final review

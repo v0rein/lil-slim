@@ -11,7 +11,7 @@ if (!dir) {
   process.exit(2);
 }
 const CORE = [
-  'brainstorming', 'dispatching-parallel-agents', 'executing-plans', 'finishing-a-development-branch',
+  'brainstorming', 'finishing-a-development-branch',
   'receiving-code-review', 'requesting-code-review', 'subagent-driven-development', 'systematic-debugging',
   'test-driven-development', 'verification-before-completion', 'writing-plans',
 ];
@@ -51,7 +51,6 @@ const rules = [
   ['code reviewer agent', /Subagent \(general-purpose\):/g, 'Subagent (`lil-slim:arbiter`):', 'requesting-code-review/code-reviewer.md'],
   ['code review dispatch', /`general-purpose` subagent/g, '`lil-slim:arbiter` subagent', 'requesting-code-review/SKILL.md'],
   ['builder check agent', /fresh general-purpose subagent/g, 'fresh `lil-slim:oracle` subagent', 'brainstorming/builder-check-prompt.md'],
-  ['parallel agent type', /Subagent \(general-purpose\):/g, 'Subagent (`lil-slim:fixer`):', 'dispatching-parallel-agents/SKILL.md'],
 ];
 
 const used = new Set();

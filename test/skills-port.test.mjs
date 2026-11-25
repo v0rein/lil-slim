@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const posix = (p) => p.split(path.sep).join('/');
 const CORE = [
-  'brainstorming', 'dispatching-parallel-agents', 'executing-plans', 'finishing-a-development-branch',
+  'brainstorming', 'finishing-a-development-branch',
   'receiving-code-review', 'requesting-code-review', 'subagent-driven-development', 'systematic-debugging',
   'test-driven-development', 'verification-before-completion', 'writing-plans',
 ];
@@ -25,7 +25,7 @@ function findBash() {
   return c.find((x) => existsSync(x));
 }
 
-test('the eleven workflow skills ship with a SKILL.md each', () => {
+test('the nine workflow skills ship with a SKILL.md each', () => {
   for (const n of CORE) assert.ok(existsSync(path.join(root, 'skills', n, 'SKILL.md')), n);
 });
 
@@ -57,12 +57,9 @@ test('helper scripts run through run.sh sdd, never as bare bash scripts', () => 
     assert.doesNotMatch(t, /`scripts\/(task-start|task-done|task-brief|review-package|sdd-workspace|sdd-repo)/, `${rel}: bare script path`);
     assert.doesNotMatch(t, /\.\.\/subagent-driven-development\/scripts/, `${rel}: relative script path`);
   }
-  for (const n of ['executing-plans', 'subagent-driven-development']) {
-    const t = text(path.join(root, 'skills', n, 'SKILL.md'));
-    assert.match(t, /\$\{CLAUDE_PLUGIN_ROOT\}\/hooks\/scripts\/run\.sh" sdd/, `${n}: no resolved sdd command`);
-  }
+  const sdd = text(path.join(root, 'skills', 'subagent-driven-development', 'SKILL.md'));
+  assert.match(sdd, /\$\{CLAUDE_PLUGIN_ROOT\}\/hooks\/scripts\/run\.sh" sdd/, 'no resolved sdd command');
   assert.ok(!existsSync(path.join(root, 'skills', 'subagent-driven-development', 'scripts')), 'bash scripts must not ship');
-  assert.ok(!existsSync(path.join(root, 'skills', 'executing-plans', 'scripts')), 'bash scripts must not ship');
 });
 
 test('delegation targets are lil-slim agents', () => {

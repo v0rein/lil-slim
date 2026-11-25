@@ -211,6 +211,12 @@ You MUST complete each phase before proceeding to the next.
 
    This is NOT a failed hypothesis - this is a wrong architecture.
 
+   The same holds outside bugs: when any task keeps growing through patches,
+   workarounds, shims, or a new path built beside an old one, stop. Ask
+   whether you would build it this way starting fresh. If not, tell your
+   human partner in a few lines where it is drifting, the cleaner
+   alternative, and your recommendation, then let them decide.
+
 ## Red Flags - STOP and Follow Process
 
 If you catch yourself thinking:
