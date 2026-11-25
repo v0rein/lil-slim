@@ -1,6 +1,5 @@
 //! `lil-hook sdd <cmd>`: Rust port of the superpowers plan-execution helper
-//! scripts (sdd-repo, sdd-workspace, task-brief, review-package, task-start,
-//! task-done). Same arguments, output lines and exit codes as the bash
+//! scripts (sdd-repo, sdd-workspace, task-brief, review-package). Same arguments, output lines and exit codes as the bash
 //! originals, so the skills read the same either way. State lives under
 //! `<repo>/.lil-slim/sdd/<plan>/` (the originals use `.superpowers/sdd/`).
 //!
@@ -450,88 +449,6 @@ pub fn review_package(args: &[String]) -> Out {
     Out::ok(format!("wrote {}: {count} commit(s), {} bytes\n", out_path.display().to_string().replace('\\', "/"), body.len()))
 }
 
-pub fn task_start(args: &[String]) -> Out {
-    if args.len() != 2 {
-        return Out::fail(2, "usage: task-start PLAN_FILE TASK_NUMBER\n");
-    }
-    let repo = match repo_root(&None, true) {
-        Ok(r) => r,
-        Err(e) => return e,
-    };
-    let b = task_brief(args);
-    if b.code != 0 {
-        return b;
-    }
-    let Some(path) = b.stdout.strip_prefix("wrote ").and_then(|s| s.rsplit_once(": ")).map(|(p, _)| p.to_string()) else {
-        return Out::fail(1, format!("task-brief did not report a path: {}\n", b.stdout.trim()));
-    };
-    let base = git(&repo, &["rev-parse", "--verify", "HEAD"]).unwrap_or_default();
-    Out { code: 0, stdout: format!("brief: {path}\nbase: {base}\n"), stderr: b.stderr }
-}
-
-fn render_cmd(argv: &[String]) -> String {
-    argv.iter()
-        .map(|a| if a.chars().any(|c| c.is_whitespace() || matches!(c, '"' | ';' | '|' | '&')) { format!("'{a}'") } else { a.clone() })
-        .collect::<Vec<_>>()
-        .join(" ")
-}
-
-pub fn task_done(args: &[String]) -> Out {
-    if args.len() < 5 || args[3] != "--" {
-        return Out::fail(2, "usage: task-done PLAN_FILE TASK_NUMBER BASE -- TEST_COMMAND [ARGS...]\n");
-    }
-    let (plan, n, base) = (&args[0], &args[1], &args[2]);
-    let argv = &args[4..];
-    let repo = match repo_root(&None, true) {
-        Ok(r) => r,
-        Err(e) => return e,
-    };
-    if !git_ok(&repo, &["rev-parse", "--verify", "--quiet", base]) {
-        return Out::fail(2, format!("bad BASE: {base}\n"));
-    }
-    let dir = match workspace_dir(&None, plan) {
-        Ok(d) => d,
-        Err(e) => return e,
-    };
-    let log = dir.join(format!("task-{n}-tests.log"));
-    let ledger = dir.join("progress.md");
-    let cmd = render_cmd(argv);
-
-    let output = Command::new(&argv[0]).args(&argv[1..]).output();
-    let (rc, bytes) = match output {
-        Ok(o) => {
-            let mut b = o.stdout;
-            b.extend_from_slice(&o.stderr);
-            (o.status.code().unwrap_or(1), b)
-        }
-        Err(e) => (127, format!("{e}\n").into_bytes()),
-    };
-    let _ = fs::write(&log, &bytes);
-    let text = String::from_utf8_lossy(&bytes).to_string();
-    let lines: Vec<&str> = text.lines().collect();
-    let tail = lines[lines.len().saturating_sub(5)..].join("\n");
-    let mut stdout = if tail.is_empty() { String::new() } else { format!("{tail}\n") };
-    if rc != 0 {
-        return Out {
-            code: rc,
-            stdout,
-            stderr: format!("task-done: test command exited {rc}; Task {n} NOT recorded (full output: {})\n", pretty(&log)),
-        };
-    }
-    let last = lines.iter().rev().find(|l| !l.trim().is_empty()).copied().unwrap_or("(no output)");
-    if !ledger.exists() {
-        let _ = fs::write(&ledger, format!("# SDD ledger — plan: {plan}\n"));
-    }
-    let b7 = git(&repo, &["rev-parse", "--short=7", base]).unwrap_or_default();
-    let h7 = git(&repo, &["rev-parse", "--short=7", "HEAD"]).unwrap_or_default();
-    let line = format!("Task {n}: complete (commits {b7}..{h7}, tests: {cmd} → {last})");
-    if let Ok(mut f) = fs::OpenOptions::new().append(true).create(true).open(&ledger) {
-        let _ = writeln!(f, "{line}");
-    }
-    stdout.push_str(&format!("ledger: {line}\n"));
-    Out::ok(stdout)
-}
-
 pub fn run(args: &[String]) -> Out {
     let sub = args.first().map(String::as_str).unwrap_or("");
     let rest = if args.is_empty() { &[][..] } else { &args[1..] };
@@ -540,9 +457,7 @@ pub fn run(args: &[String]) -> Out {
         "workspace" => workspace(rest),
         "task-brief" => task_brief(rest),
         "review-package" => review_package(rest),
-        "task-start" => task_start(rest),
-        "task-done" => task_done(rest),
-        _ => Out::fail(2, "usage: lil-hook sdd <repo|workspace|task-brief|review-package|task-start|task-done> ...\n"),
+        _ => Out::fail(2, "usage: lil-hook sdd <repo|workspace|task-brief|review-package> ...\n"),
     }
 }
 

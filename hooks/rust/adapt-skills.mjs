@@ -28,8 +28,6 @@ const rules = [
   ['cmd workspace (bash)', /`bash scripts\/sdd-workspace ([^`]*)`/g, (_, a) => `\`${RUN} workspace ${a}\``, 'skill'],
   ['cmd workspace (relative)', /`\.\.\/subagent-driven-development\/scripts\/sdd-workspace ([^`]*)`/g, (_, a) => `\`${RUN} workspace ${a}\``, 'skill'],
   ['cmd review-package (relative)', /`\.\.\/subagent-driven-development\/scripts\/review-package ([^`]*)`/g, (_, a) => `\`${RUN} review-package ${a}\``, 'skill'],
-  ['cmd task-start', /`scripts\/task-start ([^`]*)`/g, (_, a) => `\`${RUN} task-start ${a}\``, 'skill'],
-  ['cmd task-done', /`scripts\/task-done ([^`]*)`/g, (_, a) => `\`${RUN} task-done ${a}\``, 'skill'],
   // companion files are read verbatim (no ${CLAUDE_PLUGIN_ROOT} substitution): name the command, don't spell a path
   ['companion review-package', /`bash scripts\/review-package ([^`]*)`/g, (_, a) => `the \`sdd review-package ${a}\` command from SKILL.md`, 'companion'],
   ['companion task-brief', /`bash scripts\/task-brief ([^`]*)`/g, (_, a) => `the \`sdd task-brief ${a}\` command from SKILL.md`, 'companion'],

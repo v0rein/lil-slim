@@ -18,7 +18,7 @@
 # directory (where 'git init' would be the wrong fix) and a new project
 # that has no repository or commit yet.
 #
-# Single source of truth for which repository the SDD and executing-plans
+# Single source of truth for which repository the SDD
 # scripts work in, so no two of them can disagree.
 #
 # Usage: sdd-repo [--with-commit]
