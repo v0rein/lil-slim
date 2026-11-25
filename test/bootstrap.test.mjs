@@ -11,8 +11,8 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (f) => readFileSync(path.join(root, f), 'utf8');
 const SKILL = 'skills/using-lil-slim/SKILL.md';
 const WORKFLOW = [
-  'brainstorming', 'writing-plans', 'executing-plans', 'subagent-driven-development',
-  'dispatching-parallel-agents', 'systematic-debugging', 'test-driven-development',
+  'brainstorming', 'writing-plans', 'subagent-driven-development',
+  'systematic-debugging', 'test-driven-development',
   'verification-before-completion', 'requesting-code-review', 'receiving-code-review',
   'finishing-a-development-branch',
 ];
@@ -27,7 +27,7 @@ test('using-lil-slim is a real skill with the right name and trigger', () => {
 
 test('it routes every workflow skill and names the agent that does the work', () => {
   const t = read(SKILL);
-  for (const s of [...WORKFLOW, 'deepwork', 'council', 'worktrees']) assert.match(t, new RegExp(`lil-slim:${s}`), s);
+  for (const s of [...WORKFLOW, 'council', 'worktrees']) assert.match(t, new RegExp(`lil-slim:${s}`), s);
   for (const a of ['oracle', 'designer', 'explorer', 'fixer', 'arbiter', 'validator', 'debugger', 'hunter', 'paladin', 'proctor', 'janitor']) {
     assert.match(t, new RegExp(`\`${a}\``), `agent ${a} not mentioned`);
   }
@@ -35,7 +35,7 @@ test('it routes every workflow skill and names the agent that does the work', ()
 
 test('it keeps the superpowers rule strength: mandatory, with red flags and user precedence', () => {
   const t = read(SKILL);
-  assert.match(t, /1% chance/);
+  assert.match(t, /plausibly applies/);
   assert.match(t, /ABSOLUTELY MUST invoke/);
   assert.match(t, /SUBAGENT-STOP/);
   assert.match(t, /Red Flags/);
@@ -134,7 +134,7 @@ test('small plans skip the ledger and workspace', () => {
   const t = sk();
   assert.match(t, /(three|3) tasks or fewer|up to (three|3) tasks/i);
   assert.match(t, /skip.{0,40}(ledger|workspace)/i);
-  assert.match(t, /sdd (workspace|task-start|task-done)/);
+  assert.match(t, /sdd workspace/);
 });
 
 test('large plans and risky work keep the full process', () => {
@@ -155,7 +155,7 @@ test('the skill stays small even with the cost rules', () => {
 test('the cost rules do not weaken the mandatory skill check', () => {
   const t = sk();
   assert.match(t, /ABSOLUTELY MUST invoke/);
-  assert.match(t, /1% chance/);
+  assert.match(t, /plausibly applies/);
 });
 
 // ---- release notes for the skill-loading behaviour -----------------------

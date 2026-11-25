@@ -14,26 +14,20 @@ const names = readdirSync(skillsDir, { withFileTypes: true })
   .map((d) => d.name)
   .sort();
 
-test('exactly the twenty shipped skills', () => {
+test('exactly the fourteen shipped skills', () => {
   assert.deepEqual(names, [
     'ai-estimates',
     'brainstorming',
     'council',
     'deanchor',
-    'deepwork',
-    'dispatching-parallel-agents',
-    'executing-plans',
     'finishing-a-development-branch',
     'receiving-code-review',
     'requesting-code-review',
-    'simplify',
-    'step-back',
     'subagent-driven-development',
     'systematic-debugging',
     'test-driven-development',
     'using-lil-slim',
     'verification-before-completion',
-    'verification-planning',
     'worktrees',
     'writing-plans',
   ]);
@@ -52,7 +46,7 @@ test('each SKILL.md has name = dir, description, and no OpenCode vocabulary', ()
 
 test('no OpenCode-era branch prefix or activation-prompt wording', () => {
   const wt = readFileSync(path.join(skillsDir, 'worktrees', 'SKILL.md'), 'utf8');
-  const dw = readFileSync(path.join(skillsDir, 'deepwork', 'SKILL.md'), 'utf8');
+  const dw = readFileSync(path.join(skillsDir, 'subagent-driven-development', 'references', 'multi-phase.md'), 'utf8');
   assert.doesNotMatch(wt, /omos\//);
   assert.doesNotMatch(dw, /activation\s+prompt/);
   assert.doesNotMatch(dw, /<session-id>/);
@@ -63,18 +57,12 @@ test('skills carry no repo-specific leftovers from the OpenCode source', () => {
   for (const n of names) {
     assert.doesNotMatch(read(n), /\.slim\b/, `${n}: .slim/ path`);
   }
-  const s = read('simplify');
-  assert.doesNotMatch(s, /AGENTS\.md/);
-  assert.match(s, /CLAUDE\.md/);
-  assert.doesNotMatch(s, /Guidance for This Repository/);
-  assert.doesNotMatch(s, /straightforward TypeScript/);
-  assert.match(s, /existing (code )?style/i);
 });
 
-test('deepwork and worktrees use the plugin-owned .lil-slim/ state directory', () => {
-  const dw = readFileSync(path.join(skillsDir, 'deepwork', 'SKILL.md'), 'utf8');
+test('multi-phase work and worktrees use the plugin-owned .lil-slim/ state directory', () => {
+  const dw = readFileSync(path.join(skillsDir, 'subagent-driven-development', 'references', 'multi-phase.md'), 'utf8');
   const wt = readFileSync(path.join(skillsDir, 'worktrees', 'SKILL.md'), 'utf8');
-  assert.match(dw, /\.lil-slim\/deepwork\//);
+  assert.match(dw, /\.lil-slim\/phases\//);
   assert.match(wt, /\.lil-slim\/worktrees\//);
   assert.match(wt, /\.lil-slim\/worktrees\.json/);
   assert.doesNotMatch(wt, /\.claude\/worktrees/);

@@ -10,7 +10,7 @@ Plain markdown, JSON and dependency-free Node scripts: no build, no
 | Piece | Where |
 |---|---|
 | Agents (19): `orchestrator`; specialists `explorer`, `oracle`, `designer`, `fixer`, `observer`, `skeptic`; read-only audits `arbiter`, `hunter`, `janitor`, `paladin`, `proctor`; execution `validator`, `fast-generic`, `debugger`; docs `documenter`, `chronicler`; council seats `council`, `councillor` | `agents/*.md` |
-| Skills (20): `ai-estimates`, `council`, `deanchor`, `deepwork`, `simplify`, `step-back`, `verification-planning`, `worktrees`; plus the plan-and-execute workflow `brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`, `dispatching-parallel-agents`, `systematic-debugging`, `test-driven-development`, `verification-before-completion`, `requesting-code-review`, `receiving-code-review`, `finishing-a-development-branch`; the session starter `using-lil-slim` | `skills/*/SKILL.md` |
+| Skills (14): `ai-estimates`, `council`, `deanchor`, `worktrees`; plus the plan-and-execute workflow `brainstorming`, `writing-plans`, `subagent-driven-development`, `systematic-debugging`, `test-driven-development`, `verification-before-completion`, `requesting-code-review`, `receiving-code-review`, `finishing-a-development-branch`; the session starter `using-lil-slim` | `skills/*/SKILL.md` |
 | Hooks: `skill-bootstrap`, `phase-reminder`, `search-path-guard`, `tool-loop-guard`, `absolute-path-rescue`, `readonly-shell-guard` | `hooks/hooks.json`, `hooks/scripts/*.mjs` (launched via `run.sh`) |
 | MCP: `context7`, `gh_grep` (no API key) | `.mcp.json` |
 
@@ -73,7 +73,7 @@ name: reviewer
 description: When Claude should pick this agent, in one or two sentences.
 model: sonnet
 disallowedTools: Edit, Write, NotebookEdit
-skills: [lil-slim:simplify]
+skills: [lil-slim:systematic-debugging]
 ---
 
 Prompt body. Do not dispatch other agents.
@@ -160,14 +160,13 @@ Both plugins loaded in one session (one run): both SessionStart hooks ran and ex
 
 ## State directory
 
-The `deepwork` and `worktrees` skills keep their state under `.lil-slim/` in your
-project (`.lil-slim/deepwork/<slug>/progress.md`, `.lil-slim/worktrees/<slug>/`,
+Multi-phase work (`subagent-driven-development`) and `worktrees` keep their state under `.lil-slim/` in your
+project (`.lil-slim/phases/<slug>/progress.md`, `.lil-slim/sdd/<plan>/`, `.lil-slim/worktrees/<slug>/`,
 `.lil-slim/worktrees.json`). Both skills add the paths to `.gitignore` themselves.
 
 ## Overlap with other plugins
 
-The `explorer`/`oracle`/`fixer` agents and the `simplify`/`worktrees`/
-`verification-planning` skills overlap with Claude Code built-ins and plugins
+The `explorer`/`oracle`/`fixer` agents and the `worktrees` skill overlap with Claude Code built-ins and plugins
 such as superpowers and caveman. Names are namespaced, so nothing collides, but
 routing by `description` may pick another plugin's agent; the orchestrator
 always uses the prefixed names. Hooks from other plugins (for example

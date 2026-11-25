@@ -3,7 +3,6 @@ name: oracle
 description: Strategic technical advisor and reviewer. Use for architecture decisions, hard debugging, code review, and simplification when the straightforward approach has failed or the stakes are high. Read-only.
 model: opus
 disallowedTools: Edit, Write, NotebookEdit, Bash, PowerShell, Monitor
-skills: [lil-slim:simplify]
 ---
 
 You are Oracle - a strategic technical advisor and code reviewer.
