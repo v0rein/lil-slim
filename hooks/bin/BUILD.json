@@ -1,30 +1,30 @@
 {
-  "sourceHash": "baabb77cfbff0b864018a6dc55304246f7cffb5453fca341b562dec3184b0e5c",
+  "sourceHash": "68f29facf8d98f967bd3a217bf9026de111c70d4dec922957ff5d7be2f6b45a0",
   "platforms": {
     "linux-x64": {
       "file": "linux-x64/lil-hook",
-      "bytes": 1549680,
-      "sha256": "d99dcf9c0e32de61b15636443934baa90e6326c2550affffe743a568d1f20586"
+      "bytes": 1537392,
+      "sha256": "e4b4d5f076e31e80f9b841e9c3fc3a34552accff95d53697025fee54b2dd493f"
     },
     "linux-arm64": {
       "file": "linux-arm64/lil-hook",
       "bytes": 1250120,
-      "sha256": "9b8c813a171a50441f127395b671a303434c047d7f13b054babe1fcc01a6e57a"
+      "sha256": "353eca6ff2816b1d11719d68a4e216ee3a3bbba54b6a4f30215b11b1f2e7935c"
     },
     "darwin-arm64": {
       "file": "darwin-arm64/lil-hook",
-      "bytes": 1116720,
-      "sha256": "edddfa2522323ebfa43a7cc113dc88c1083879128f9b379af150389c0c758866"
+      "bytes": 1116688,
+      "sha256": "2b3d6c2bf4a02b2e3b193dd3a2c21a5ee6284943259de219a33b6662c990a209"
     },
     "darwin-x64": {
       "file": "darwin-x64/lil-hook",
-      "bytes": 1222920,
-      "sha256": "bb7aaa3f8221883f52aabd0b905083fadb32435d1722abf3b8195080dfe1a920"
+      "bytes": 1218784,
+      "sha256": "96df7c0fd080af9bcf14a46c8100a94df6f5b361e28f613b4e86aa0587e9e83e"
     },
     "windows-x64": {
       "file": "windows-x64/lil-hook.exe",
-      "bytes": 1259008,
-      "sha256": "be547a610a815fce172abd65831f583224b5c54d9979e08b5283d92885c3521f"
+      "bytes": 1251328,
+      "sha256": "5e429b4f071daf9fb36116b9e8f6a32d30065a3647d1ecf109d201e506873da7"
     }
   }
 }
